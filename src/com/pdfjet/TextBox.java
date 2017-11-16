@@ -1,38 +1,38 @@
 /**
  *  TextBox.java
  *
- Copyright (c) 2016, Innovatics Inc.
- All rights reserved.
+Copyright (c) 2016, Innovatics Inc.
+All rights reserved.
 
- Redistribution and use in source and binary forms, with or without modification,
- are permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
 
- * Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+ 
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and / or other materials provided with the distribution.
 
- * Redistributions in binary form must reproduce the above copyright notice,
- this list of conditions and the following disclaimer in the documentation
- and / or other materials provided with the distribution.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 package com.pdfjet;
 
 import java.util.*;
 
 /**
  *  A box containing line-wrapped text.
- *
+ *  
  *  <p>Defaults:<br />
  *  x = 0f<br />
  *  y = 0f<br />
@@ -43,7 +43,7 @@ import java.util.*;
  *  spacing = 3f<br />
  *  margin = 1f<br />
  *  </p>
- *
+ *  
  *  This class was originally developed by Ronald Bourret.
  *  It was completely rewritten in 2013 by Eugene Dragoev.
  */
@@ -210,7 +210,7 @@ public class TextBox implements Drawable {
         this.x = x;
         this.y = y;
     }
-
+    
 
     /**
      *  Gets the x coordinate where this text box will be drawn on the page.
@@ -219,7 +219,7 @@ public class TextBox implements Drawable {
      */
     public float getX() {
         return x;
-    }
+    }    
 
 
     /**
@@ -229,7 +229,7 @@ public class TextBox implements Drawable {
      */
     public float getY() {
         return y;
-    }
+    }    
 
 
     /**
@@ -281,7 +281,7 @@ public class TextBox implements Drawable {
         this.height = height;
     }
 
-
+    
     /**
      *  Returns the text box height.
      *
@@ -311,7 +311,7 @@ public class TextBox implements Drawable {
         this.margin = margin;
     }
 
-
+    
     /**
      *  Returns the text box margin.
      *
@@ -609,7 +609,7 @@ public class TextBox implements Drawable {
 
     /**
      *  Whether the text will be underlined.
-     *
+     *  
      *  @return whether the text will be underlined
      */
     public boolean getUnderline() {
@@ -750,49 +750,26 @@ public class TextBox implements Drawable {
             if (getBgColor() != Color.white) {
                 drawBackground(page);
             }
-
+     
             page.setPenColor(this.pen);
             page.setBrushColor(this.brush);
             page.setPenWidth(this.font.underlineThickness);
         }
-
+ 
         float textAreaWidth = width - 2*margin;
         List<String> list = new ArrayList<String>();
         StringBuilder buf = new StringBuilder();
         String[] lines = text.split("\\r?\\n");
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-/*
             if (font.stringWidth(line) < textAreaWidth) {
-                list.add(line);
-            }
-            else {
-                buf.setLength(0);
-                String[] tokens = line.split("\\s+");
-                for (String token : tokens) {
-                    if (font.stringWidth(buf.toString() + " " + token) < textAreaWidth) {
-                        buf.append(" " + token);
-                    }
-                    else {
-                        list.add(buf.toString().trim());
-                        buf.setLength(0);
-                        buf.append(token);
-                    }
-                }
-                if (!buf.toString().trim().equals("")) {
-                    list.add(buf.toString().trim());
-                }
-            }
-*/
-            String spaces = "  ";
-            if (font.stringWidth(line) < (textAreaWidth - font.stringWidth(spaces))) {
                 list.add(line);
             }
             else {
                 buf.setLength(0);
                 for (int j = 0; j < line.length(); j++) {
                     buf.append(line.charAt(j));
-                    if (font.stringWidth(buf.toString()) >= (textAreaWidth - font.stringWidth(spaces))) {
+                    if (font.stringWidth(buf.toString()) >= textAreaWidth) {
                         while (j > 0 && line.charAt(j) != ' ') {
                             j -= 1;
                         }
@@ -812,7 +789,7 @@ public class TextBox implements Drawable {
             }
         }
         lines = list.toArray(new String[] {} );
-
+ 
         float lineHeight = font.getBodyHeight() + spacing;
         float x_text;
         float y_text = y + font.ascent + margin;
@@ -825,9 +802,9 @@ public class TextBox implements Drawable {
             else if (valign == Align.CENTER) {
                 y_text += (height - lines.length*lineHeight)/2;
             }
-
+ 
             for (int i = 0; i < lines.length; i++) {
-
+     
                 if (getTextAlignment() == Align.RIGHT) {
                     x_text = (x + width) - (font.stringWidth(lines[i]) + margin);
                 }
@@ -838,7 +815,7 @@ public class TextBox implements Drawable {
                     // Align.LEFT
                     x_text = x + margin;
                 }
-
+     
                 if (y_text + font.getBodyHeight() + spacing + font.getDescent() >= y + height
                         && i < (lines.length - 1)) {
                     String str = lines[i];
@@ -850,7 +827,7 @@ public class TextBox implements Drawable {
                         lines[i] = str + " ...";
                     }
                 }
-
+    
                 if (y_text + font.getDescent() < y + height) {
                     if (draw) {
                         drawText(page, font, fallbackFont, lines[i], x_text, y_text, colors);
@@ -864,7 +841,7 @@ public class TextBox implements Drawable {
         else {
 
             for (int i = 0; i < lines.length; i++) {
-
+     
                 if (getTextAlignment() == Align.RIGHT) {
                     x_text = (x + width) - (font.stringWidth(lines[i]) + margin);
                 }
@@ -875,7 +852,7 @@ public class TextBox implements Drawable {
                     // Align.LEFT
                     x_text = x + margin;
                 }
-
+     
                 if (draw) {
                     drawText(page, font, fallbackFont, lines[i], x_text, y_text, colors);
                 }
@@ -913,7 +890,7 @@ public class TextBox implements Drawable {
         else {
             page.drawString(font, fallbackFont, text, x_text, y_text);
         }
-
+ 
         float lineLength = font.stringWidth(text);
         if (getUnderline()) {
             float y_adjust = font.underlinePosition;

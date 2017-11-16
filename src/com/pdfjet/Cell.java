@@ -1,7 +1,7 @@
 /**
  *  Cell.java
  *
-Copyright (c) 2015, Innovatics Inc.
+Copyright (c) 2016, Innovatics Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -218,7 +218,7 @@ public class Cell {
 
     /**
      * Sets the composite text object.
-     * 
+     *
      * @param compositeTextLine the composite text object.
      */
     public void setCompositeTextLine(CompositeTextLine compositeTextLine) {
@@ -228,7 +228,7 @@ public class Cell {
 
     /**
      * Returns the composite text object.
-     * 
+     *
      * @return the composite text object.
      */
     public CompositeTextLine getCompositeTextLine() {
@@ -324,7 +324,7 @@ public class Cell {
 
     /**
      * Sets the border line width.
-     * 
+     *
      * @param lineWidth the border line width.
      */
     public void setLineWidth(float lineWidth) {
@@ -334,7 +334,7 @@ public class Cell {
 
     /**
      * Returns the border line width.
-     * 
+     *
      * @return the border line width.
      */
     public float getLineWidth() {
@@ -391,8 +391,8 @@ public class Cell {
 
 
     /**
-     *  Returns the brush color. 
-     * 
+     *  Returns the brush color.
+     *
      * @return the brush color.
      */
     public int getBrushColor() {
@@ -537,7 +537,7 @@ public class Cell {
 
     /**
      * Returns the underline text parameter.
-     * 
+     *
      * @return the underline text parameter.
      */
     public boolean getUnderline() {
@@ -547,7 +547,7 @@ public class Cell {
 
     /**
      * Sets the strikeout text parameter.
-     * 
+     *
      * @param strikeout the strikeout text parameter.
      */
     public void setStrikeout(boolean strikeout) {
@@ -562,7 +562,7 @@ public class Cell {
 
     /**
      * Returns the strikeout text parameter.
-     * 
+     *
      * @return the strikeout text parameter.
      */
     public boolean getStrikeout() {
@@ -629,7 +629,7 @@ public class Cell {
             float cell_w,
             float cell_h) throws Exception {
         page.setBrushColor(background);
-        page.fillRect(x, y, cell_w, cell_h);
+        page.fillRect(x, y + lineWidth / 2, cell_w, cell_h + lineWidth);
     }
 
 
@@ -652,31 +652,32 @@ public class Cell {
             page.addEMC();
         }
         else {
+            float qWidth = lineWidth / 4;
             if (getBorder(Border.TOP)) {
                 page.addBMC(StructElem.SPAN, Single.space, Single.space);
-                page.moveTo(x, y);
+                page.moveTo(x - qWidth, y);
                 page.lineTo(x + cell_w, y);
                 page.strokePath();
                 page.addEMC();
             }
             if (getBorder(Border.BOTTOM)) {
                 page.addBMC(StructElem.SPAN, Single.space, Single.space);
-                page.moveTo(x, y + cell_h);
+                page.moveTo(x - qWidth, y + cell_h);
                 page.lineTo(x + cell_w, y + cell_h);
                 page.strokePath();
                 page.addEMC();
             }
             if (getBorder(Border.LEFT)) {
                 page.addBMC(StructElem.SPAN, Single.space, Single.space);
-                page.moveTo(x, y);
-                page.lineTo(x, y + cell_h);
+                page.moveTo(x, y - qWidth);
+                page.lineTo(x, y + cell_h + qWidth);
                 page.strokePath();
                 page.addEMC();
             }
             if (getBorder(Border.RIGHT)) {
                 page.addBMC(StructElem.SPAN, Single.space, Single.space);
-                page.moveTo(x + cell_w, y);
-                page.lineTo(x + cell_w, y + cell_h);
+                page.moveTo(x + cell_w, y - qWidth);
+                page.lineTo(x + cell_w, y + cell_h + qWidth);
                 page.strokePath();
                 page.addEMC();
             }
@@ -835,7 +836,7 @@ public class Cell {
             return n;
         }
 
-        n = 0; 
+        n = 0;
         for (String textLine : textLines) {
             String[] tokens = textLine.split("\\s+");
             StringBuilder sb = new StringBuilder();

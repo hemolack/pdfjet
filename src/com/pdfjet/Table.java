@@ -1,31 +1,31 @@
 /**
  *  Table.java
  *
- Copyright (c) 2015, Innovatics Inc.
- All rights reserved.
+Copyright (c) 2016, Innovatics Inc.
+All rights reserved.
 
- Redistribution and use in source and binary forms, with or without modification,
- are permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
 
- * Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
 
- * Redistributions in binary form must reproduce the above copyright notice,
- this list of conditions and the following disclaimer in the documentation
- and / or other materials provided with the distribution.
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and / or other materials provided with the distribution.
 
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 package com.pdfjet;
 
@@ -353,7 +353,7 @@ public class Table {
      *  @return the width of the column.
      */
     public float getColumnWidth(int index) throws Exception {
-        return getCellAtRowColumn(0, index).getWidth();
+        return getCellAtRowColumn(0, index).getWidth(); 
     }
 
 
@@ -873,4 +873,36 @@ public class Table {
         tableData = tableData2;
     }
 
-}
+
+    /**
+     * This method removes borders that have the same color and overlap 100%.
+     * The result is improved onscreen rendering of thin border lines by some PDF viewers.
+     */
+    public void mergeOverlaidBorders() {
+        for (int i = 0; i < tableData.size(); i++) {
+            List<Cell> currentRow = tableData.get(i);
+            for (int j = 0; j < currentRow.size(); j++) {
+                Cell currentCell = currentRow.get(j);
+                if (j < currentRow.size() - 1) {
+                    Cell cellAtRight = currentRow.get(j + 1);
+                    if (cellAtRight.getBorder(Border.LEFT) &&
+                            currentCell.getPenColor() == cellAtRight.getPenColor() &&
+                            currentCell.getLineWidth() == cellAtRight.getLineWidth() &&
+                            (currentCell.getColSpan() + j) < (currentRow.size() - 1)) {
+                        currentCell.setBorder(Border.RIGHT, false);
+                    }
+                }
+                if (i < tableData.size() - 1) {
+                    List<Cell> nextRow = tableData.get(i + 1);
+                    Cell cellBelow = nextRow.get(j);
+                    if (cellBelow.getBorder(Border.TOP) &&
+                            currentCell.getPenColor() == cellBelow.getPenColor() &&
+                            currentCell.getLineWidth() == cellBelow.getLineWidth()) {
+                        currentCell.setBorder(Border.BOTTOM, false);
+                    }
+                }
+            }
+        }
+    }
+
+}   // End of Table.java

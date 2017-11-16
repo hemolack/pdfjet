@@ -1,7 +1,7 @@
 /**
  *  Font.java
  *
-Copyright (c) 2016, Innovatics Inc.
+Copyright (c) 2017, Innovatics Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -47,7 +47,7 @@ public class Font {
 
     // Chinese (Simplified) font
     public static final String STHeitiSC_Light = "STHeitiSC-Light";
-
+    
     // Japanese font
     public static final String KozMinProVI_Regular = "KozMinProVI-Regular";
 
@@ -57,6 +57,7 @@ public class Font {
     public static final boolean STREAM = true;
 
     protected String name;
+    protected String info;
     protected int objNumber;
 
     // The object number of the embedded font file
@@ -96,7 +97,7 @@ public class Font {
     protected int[] advanceWidth = null;
     protected int[] glyphWidth = null;
     protected int[] unicodeToGID;
-    protected int[] halfForm;
+    protected boolean cff;
 
     protected String fontID;
 
@@ -283,13 +284,7 @@ public class Font {
     }
 
 
-    // Constructor for the following fonts:
-    // DejaVuLGCSans-Bold.ttf.stream
-    // DejaVuLGCSans-Oblique.ttf.stream
-    // DejaVuLGCSans.ttf.stream
-    // DejaVuLGCSerif-Bold.ttf.stream
-    // DejaVuLGCSerif-Italic.ttf.stream
-    // DejaVuLGCSerif.ttf.stream
+    // Constructor for .ttf.stream fonts:
     public Font(PDF pdf, InputStream inputStream, boolean flag) throws Exception {
         FastFont.register(pdf, this, inputStream);
 
@@ -453,7 +448,7 @@ public class Font {
                 c1 -= 32;
 
                 width += metrics[c1][1];
-
+    
                 if (kernPairs && i < (str.length() - 1)) {
                     int c2 = str.charAt(i + 1);
                     if (c2 < firstChar || c2 > lastChar) {
@@ -595,7 +590,7 @@ public class Font {
                 if (c2 < firstChar || c2 > lastChar) {
                     c2 = 32;
                 }
-
+    
                 for (int j = 2; j < metrics[c1].length; j += 2) {
                     if (metrics[c1][j] == c2) {
                         w -= metrics[c1][j + 1];
@@ -621,7 +616,7 @@ public class Font {
      * Use this method when you don't have real italic font in the font family,
      * or when you want to generate smaller PDF files.
      * For example you could embed only the Regular and Bold fonts and synthesize the RegularItalic and BoldItalic.
-     *
+     * 
      * @param skew15 the skew flag.
      */
     public void setItalic(boolean skew15) {
@@ -631,7 +626,7 @@ public class Font {
 
     /**
      * Returns the width of a string drawn using two fonts.
-     *
+     * 
      * @param font2 the fallback font.
      * @param str the string.
      * @return the width.
