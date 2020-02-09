@@ -52,6 +52,7 @@ public class Table {
 
     private int rendered = 0;
     private int numOfPages;
+	private int numberOfColumns = -1;
 
     private List<List<Cell>> tableData = null;
     private int numOfHeaderRows = 0;
@@ -105,6 +106,9 @@ public class Table {
         this.y1 = y;
     }
 
+	public Point getLocation() {
+		return new Point(this.x1, this.y1);
+	}	
 
     /**
      *  Sets the bottom margin for this table.
@@ -162,7 +166,8 @@ public class Table {
      */
     public void autoAdjustColumnWidths() {
         // Find the maximum text width for each column
-        float[] max_col_widths = new float[tableData.get(0).size()];
+		float[] max_col_widths = new float[getNumberOfColumns()];
+        //float[] max_col_widths = new float[tableData.get(0).size()];
         for (int i = 0; i < tableData.size(); i++) {
             List<Cell> row = tableData.get(i);
             for (int j = 0; j < row.size(); j++) {
@@ -477,6 +482,9 @@ public class Table {
         float cell_h = 0f;
 
         for (int i = 0; i < numOfHeaderRows; i++) {
+			if(tableData.size() < 1) {
+				break;
+			}
             List<Cell> dataRow = tableData.get(i);
             cell_h = getMaxCellHeight(dataRow);
 
@@ -484,9 +492,10 @@ public class Table {
                 Cell cell = dataRow.get(j);
                 cell_w = cell.getWidth();
                 int colspan = cell.getColSpan();
-                for (int k = 1; k < colspan; k++) {
-                    cell_w += dataRow.get(++j).width;
-                }
+				cell_w = cell_w * cell.getColSpan();
+                //for (int k = 1; k < colspan; k++) {
+                //    cell_w += dataRow.get(++j).width;
+                //}
 
                 if (draw) {
                     page.setBrushColor(cell.getBrushColor());
@@ -518,7 +527,7 @@ public class Table {
                 cell_w = cell.getWidth();
                 int colspan = cell.getColSpan();
                 for (int k = 1; k < colspan; k++) {
-                    cell_w += dataRow.get(++j).getWidth();
+					cell_w += dataRow.get(++j).getWidth();
                 }
 
                 if (draw) {
@@ -571,7 +580,31 @@ public class Table {
         return max_cell_height;
     }
 
+	public float getHeight() {
+		float height = 0f;
+		for(int i = 0; i < tableData.size(); ++i) {
+			height += getMaxCellHeight(tableData.get(i));
+		}
+		return height;
+	}
 
+	public int getNumberOfColumns() {
+		if(numberOfColumns < 1) {
+			int max = numberOfColumns;
+			for(int i = 0; i < tableData.size(); ++i) {
+				int current = 0;
+				for(int j = 0; j < tableData.get(i).size(); ++j) {
+					current += tableData.get(i).get(j).getColSpan();
+				}
+				if(current > max) {
+					max = current;
+				}
+			}
+			numberOfColumns = max;
+		}
+		return numberOfColumns;
+	}
+	
     /**
      *  Returns true if the table contains more data that needs to be drawn on a page.
      */
@@ -587,7 +620,10 @@ public class Table {
      */
     public float getWidth() {
         float table_width = 0f;
-        List<Cell> row = tableData.get(0);
+		if(tableData.size() < 1) {
+			return A4.LANDSCAPE[0];
+		}
+        List<Cell> row = tableData.get(tableData.size() - 1);
         for (int i = 0; i < row.size(); i++) {
             table_width += row.get(i).getWidth();
         }
@@ -894,12 +930,14 @@ public class Table {
                 }
                 if (i < tableData.size() - 1) {
                     List<Cell> nextRow = tableData.get(i + 1);
-                    Cell cellBelow = nextRow.get(j);
-                    if (cellBelow.getBorder(Border.TOP) &&
-                            currentCell.getPenColor() == cellBelow.getPenColor() &&
-                            currentCell.getLineWidth() == cellBelow.getLineWidth()) {
-                        currentCell.setBorder(Border.BOTTOM, false);
-                    }
+					if(j < nextRow.size() - 1) {
+						Cell cellBelow = nextRow.get(j);
+						if (cellBelow.getBorder(Border.TOP) &&
+								currentCell.getPenColor() == cellBelow.getPenColor() &&
+								currentCell.getLineWidth() == cellBelow.getLineWidth()) {
+							currentCell.setBorder(Border.BOTTOM, false);
+						}
+					}
                 }
             }
         }
